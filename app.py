@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request
 from sql_con import get_db_connection
 
+
+
 app = Flask(__name__)
 
 
