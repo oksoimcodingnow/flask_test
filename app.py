@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request
+from ast import Pass
+from flask import Flask, render_template, request, redirect
 from sql_con import get_db_connection
 
 
@@ -19,13 +20,13 @@ def formGET_index():
         if len(data) != 0:
             for k in data:
                 print(k[0], k[1], k[2], k[3])
-            print('req.args:'.len(request.args))
+            print('req.args:',len(request.args))
             if(len(request.args)!= 0):
                 Firstname = request.args.get('firstname')
                 Lastname = request.args.get('lastname')
                 conn = get_db_connection()
-                data = conn.execute('SELECT "id", "username", "firstname", "lastname"FROM user where firstname=? and lastname=?'\
-                    ,(Firstname,Lastname)).fettchall
+                data = conn.execute('SELECT "id", "username", "firstname", "lastname" FROM user where firstname=? and lastname=?'\
+                    ,(Firstname,Lastname)).fetchall()
                 conn.close()
                 print(data)
                 if data is None:
@@ -44,7 +45,7 @@ def formGET_index():
 def formPOST_index():
     
     if request.method == 'GET':
-        return render_template('form_post.html,data=data')
+        return render_template('form_post.html')
     elif request.method == 'POST':
         print(len(request.form))
         if len(request.form) != 0:
@@ -52,9 +53,17 @@ def formPOST_index():
                 print(key,value)
             Firstname = request.form.get('firstname')
             Lastname = request.form.get('lastname')
+            Username = request.form.get('username')
+            Password = request.form.get('password')
             print(Firstname)
             print(Lastname)
-            return render_template('form_post.html', data=[Firstname,Lastname])
+            print(Username)
+            print(Password)
+            conn = get_db_connection()
+            conn.execute('INSERT INTO user ("username","firstname","lastname","password") VALUES (?,?,?,?)',(Username,Firstname,Lastname,Password))
+            conn.commit()
+            conn.close()
+            return redirect("./form_get", code=302)
 
 
 
